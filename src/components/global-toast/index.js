@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { ViewPropTypes } from 'react-native';
-import iconfont from '../res/iconfont.json';
-import Toast from '../toast-view/toast';
+import { ViewPropTypes, DeviceEventEmitter } from 'react-native'
+import iconfont from '../res/iconfont.json'
+import Toast from '../toast-view/toast'
 import IconFont from '../iconfont/svg'
 import { pick, omit } from '../../utils/toast'
 import { RatioUtils } from '../../utils'
@@ -60,17 +60,39 @@ class GlobalToast extends React.PureComponent {
   render() {
     const { text, contentStyle, showPosition, color, d, size, iconfontStyle, showIcon, ...props } =
       this.props
+    const toastPropNames = Object.keys(Toast.propTypes)
+    const toastProps = pick(props, toastPropNames)
+    const iconProps = omit(props, toastPropNames)
 
-    return <View></View>
+    return (
+      <Toast
+        {...toastProps}
+        text={text}
+        showPosition={showPosition}
+        contentStyle={[
+          showIcon && {
+            paddingVertical: cx(18),
+            backgroundColor: 'rgba(0,0,0,.7)',
+            borderRadius: cx(12),
+            paddingHorizontal: cx(18)
+          },
+          contentStyle
+        ]}
+      >
+        {showIcon && (
+          <IconFont {...iconProps} d={d} size={size} color={color} style={iconfontStyle} />
+        )}
+      </Toast>
+    )
   }
 }
 
 export default GlobalToast
 
 GlobalToast.show = (props) => {
-  TYEvent.emit('showToast', { show: true, ...props })
+  DeviceEventEmitter.emit('showToast', { show: true, ...props })
 }
 
 GlobalToast.hide = () => {
-  TYEvent.emit('hideToast', { show: false })
+  DeviceEventEmitter.emit('hideToast', { show: false })
 }

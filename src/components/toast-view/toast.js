@@ -19,23 +19,30 @@ const ToastView = (props) => {
   const [show, setShow] = useState(props.show)
   const [timerId, setTimerId] = useState(null)
   const fadeValue = useRef(new Animated.Value(0)).current
+  const staticData = useRef({ isFirst: true }).current
 
   useEffect(() => {
     if (typeof props.show !== 'undefined') {
-      setText(text)
-      setShow(show)
       if (show) {
         startShowAnimation()
       }
     }
-    return timerId && clearTimeout(timerId)
+    return () => {
+      timerId && clearTimeout(timerId)
+    }
   }, [])
 
   useEffect(() => {
-    if (props.show) {
-      startShowAnimation()
+    if (staticData) {
+      staticData.isFirst = false
     } else {
-      startHideAnimation()
+      setShow(props.show)
+      setText(props.text)
+      if (props.show) {
+        startShowAnimation()
+      } else {
+        startHideAnimation()
+      }
     }
   }, [props.show, props.text])
 
@@ -45,7 +52,7 @@ const ToastView = (props) => {
       toValue: 1,
       duration: 250,
       easing: Easing.linear,
-      useNativeDriver:false
+      useNativeDriver: true
     }).start(() => timer())
   }
 
@@ -55,12 +62,12 @@ const ToastView = (props) => {
       toValue: 0,
       duration: 250,
       easing: Easing.linear,
-      useNativeDriver:false
+      useNativeDriver: true
     }).start()
   }
 
   const timer = () => {
-    timerId&&clearTimeout(timerId)
+    timerId && clearTimeout(timerId)
     setTimerId(setTimeout(() => props.onFinish(), 1200))
   }
 
@@ -80,6 +87,7 @@ const ToastView = (props) => {
   } else if (showPosition === 'center') {
     position = { justifyContent: 'center' }
   }
+
   const isValidElement = React.isValidElement(children)
 
   return (
@@ -189,7 +197,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#FFFFFF',
+    color: '#fff',
     textAlign: 'center',
     flexWrap: 'wrap'
   }

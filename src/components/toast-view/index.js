@@ -9,6 +9,4 @@ Toast.Success = Success;
 Toast.Warning = Warning;
 Toast.Loading = Loading;
 
-console.log('hello====================================',Toast.Success)
-
 export default Toast;
